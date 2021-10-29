@@ -10,7 +10,7 @@ use Validator;
 
 class AuthController extends Controller
 {
-    public function register(Request $request) 
+    public function register(Request $request)
     {
         $registrationData = $request->all();
         $validate = Validator::make($registrationData, [
@@ -19,10 +19,10 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
-        if ($validate->fails())
+        if($validate->fails())
             return response(['message' => $validate->errors()], 400);
 
-        $registrationData['password'] = bcrypt($request->password);
+        $registrationData['password'] = bcrypt($request->password); 
         $user = User::create($registrationData);
         return response([
             'message' => 'Register Success',
@@ -47,7 +47,7 @@ class AuthController extends Controller
         $user = Auth::user();
         $token = $user->createToken('Authentication Token')->accessToken;
 
-        return response ([
+        return response([
             'message' => 'Authenticated',
             'user' => $user,
             'token_type' => 'Bearer',
