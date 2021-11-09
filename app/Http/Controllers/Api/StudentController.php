@@ -115,7 +115,7 @@ class StudentController extends Controller
             return response(['message' => $validate->errors()], 400);
 
         $Students->nama_murid = $updateData['nama_murid'];
-        $students->npm = $updateData['npm'];
+        $Students->npm = $updateData['npm'];
         $Students->tanggal_lahir = $updateData['tanggal_lahir'];
         $Students->no_telp = $updateData['no_telp'];
 
