@@ -21,7 +21,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'password',
+        'password'
     ];
 
     /**
@@ -43,18 +43,19 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-
-    public function getCreatedAtAttribute() 
-    {
-        if (!is_null($this->attributes['created_at'])) {
+    public function getCreatedAtAttribute(){
+        if(!is_null($this->attributes['created_at'])){
             return Carbon::parse($this->attributes['created_at'])->format('Y-m-d H:i:s');
         }
     }
 
-    public function getUpdatedAtAttribute() 
-    {
-        if (!is_null($this->attributes['updated_at'])) {
+    public function getUpdatedAtAttribute(){
+        if(!is_null($this->attributes['updated_at'])){
             return Carbon::parse($this->attributes['updated_at'])->format('Y-m-d H:i:s');
         }
+    }
+
+    public function sendApiEmailVerificationNotification(){
+        $this->notify(new Email);
     }
 }

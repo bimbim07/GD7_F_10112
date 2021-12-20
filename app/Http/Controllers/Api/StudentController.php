@@ -5,129 +5,125 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Validator; 
-use App\Models\Students;
+use Validator;
+use App\Models\Student;
 
 class StudentController extends Controller
 {
-    //
-    public function index() 
+    public function index()
     {
-        $students = Students::all();
-        
-        if (count($students) > 0){
+        $students = Student::all();
+
+        if(count($students)>0) {
             return response([
                 'message' => 'Retrieve All Success',
                 'data' => $students
             ], 200);
         }
 
-        return response ([
+        return response([
             'message' => 'Empty',
             'data' => null
         ], 400);
     }
 
-    
     public function show($id)
     {
-        $Students = Students::find($id);
+        $student = Student::find($id);
 
-        if(!is_null($Students)){
+        if(!is_null($student)) {
             return response([
                 'message' => 'Retrieve Student Success',
-                'data' => $Students
+                'data' => $student
             ], 200);
         }
 
-        return response ([
+        return response([
             'message' => 'Student Not Found',
             'data' => null
         ], 404);
     }
 
-
-    public function store (Request $request)
+    public function store(Request $request)
     {
-        $storeData = $request->all();
-        $validate = Validator::make($storeData, [
-            'nama_murid' => 'required|regex:/^[\pL\s\-]+$/u',
+        $storeData=$request->all();
+        $validate=Validator::make($storeData, [
+            'nama' => 'required|regex:/^[\pL\s\-]+$/u|unique:students',
             'npm' => 'required|numeric',
-            'tanggal_lahir' => 'required|date',
-            'no_telp' => 'required|numeric|digits_between:10,13|starts_with:08'
+            'tanggal_lahir' => 'required|date_format:Y-m-d',
+            'no_telp' => 'required|numeric|regex:/(08)[0-9]{0,11}/|digits_between:0,13'
         ]);
-
-        if ($validate->fails())
+        
+        if($validate->fails())
             return response(['message' => $validate->errors()], 400);
 
-        $Students = Students::create($storeData);
+        $student=Student::create($storeData);
         return response([
             'message' => 'Add Student Success',
-            'data' => $Students
+            'data' => $student
         ], 200);
     }
 
-
     public function destroy($id)
     {
-        $Students = Students::find($id);
+        $student = Student::find($id);
 
-        if(is_null($Students)) {
+        if(is_null($student)) {
             return response([
                 'message' => 'Student Not Found',
                 'data' => null
             ], 404);
         }
 
-        if($Students->delete()) {
+        if($student->delete()) {
             return response([
                 'message' => 'Delete Student Success',
-                'data' => $Students
-            ], 200);
+                'data' => $student
+            ], 200); 
         }
 
         return response([
             'message' => 'Delete Student Failed',
-            'data' => null
+            'data' => null,
         ], 400);
     }
 
-
     public function update(Request $request, $id)
     {
-        $Students = Students::find($id);
-        if(is_null($Students)){
+        $student=Student::find($id);
+        if(is_null($student)) {
             return response([
                 'message' => 'Student Not Found',
                 'data' => null
             ], 404);
         }
 
-        $updateData = $request->all();
-        $validate = Validator::make($updateData, [
-            'nama_murid' => 'required|regex:/^[\pL\s\-]+$/u',
+        $updateData=$request->all();
+        $validate=Validator::make($updateData, [
+            'nama' => ['required', 'regex:/^[\pL\s\-]+$/u',Rule::unique('students')->ignore($student)],
             'npm' => 'required|numeric',
-            'tanggal_lahir' => 'required|date',
-            'no_telp' => 'required|numeric|digits_between:10,13|starts_with:08'
+            'tanggal_lahir' => 'required|date_format:Y-m-d',
+            'no_telp' => 'required|numeric|regex:/(08)[0-9]{0,11}/|digits_between:0,13'
         ]);
 
         if($validate->fails())
             return response(['message' => $validate->errors()], 400);
 
-        $Students->nama_murid = $updateData['nama_murid'];
-        $Students->npm = $updateData['npm'];
-        $Students->tanggal_lahir = $updateData['tanggal_lahir'];
-        $Students->no_telp = $updateData['no_telp'];
+        $student->nama=$updateData['nama'];
+        $student->npm=$updateData['npm'];
+        $student->tanggal_lahir=$updateData['tanggal_lahir'];
+        $student->no_telp=$updateData['no_telp'];
 
-        if($Students->save()){
+        if($student->save()) {
             return response([
                 'message' => 'Update Student Success',
-                'data' => $Students
+                'data' => $student
             ], 200);
         }
+
         return response([
             'message' => 'Update Student Failed',
-            'data' => null
+            'data' => null,
         ], 400);
     }
 }
